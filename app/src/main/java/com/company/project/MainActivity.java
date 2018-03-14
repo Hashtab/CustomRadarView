@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         List<RadarData> dataList=new ArrayList<>();
         for(int i=0;i<6;i++){
             RadarData radarData=new RadarData();
-            radarData.initData();
+            radarData.initData(i);
             dataList.add(radarData);
         }
 

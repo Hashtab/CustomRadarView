@@ -24,6 +24,7 @@ import java.util.List;
 public class RadarView extends View {
     private Context mContext;
     private int mVertical_Line_Color = 0xffffffff;
+    private int color_white=0xffffffff;
     private int mGapStrokeColor = 0x33ffffff;                   //间隔线颜色
 
 //    private int mOriginX;               //原点的x轴坐标
@@ -49,6 +50,7 @@ public class RadarView extends View {
     private Paint mGapLinePaint1;
     private Paint mGapLinePaint2;
     private Paint mValuePaint;
+    private Paint mTextPaint;
 
     public RadarView(Context context) {
         super(context);
@@ -76,36 +78,8 @@ public class RadarView extends View {
 
         count = dataList.size();
         mAngle = 2 * Math.PI / count;
-        radius = Math.min(mPointCenter.x, mPointCenter.y);
+        radius = Math.min(mPointCenter.x, mPointCenter.y)/2*0.9f;
         spiltRadius = radius / gapCount / 2;
-
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mPointCenter = new PointF(w / 2, h / 2);
-
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-//        Paint paint=new Paint();
-//        paint.setAntiAlias(true);       //抗锯齿功能
-//        paint.setStyle(Paint.Style.FILL);       //内部填充
-//        paint.setColor(mVertical_Line_Color);   //设置画笔颜色
-
-        if (dataList == null || dataList.size() == 0) {
-            return;
-        }
-        initView();
-        initPaint();
-        drawLine(canvas);
-//        drawPolygon(canvas);
-        drawRecGap(canvas);
-        drawDataPoint(canvas);
 
     }
 
@@ -132,6 +106,11 @@ public class RadarView extends View {
         mValuePaint.setStyle(Paint.Style.FILL);
         mValuePaint.setColor(mVertical_Line_Color);
         mValuePaint.setAlpha(125);
+
+        mTextPaint=new Paint();
+        mTextPaint.setTextSize(sp2px(mContext,15f));
+        mTextPaint.setStyle(Paint.Style.FILL);
+        mTextPaint.setColor(color_white);
 
 
     }
@@ -236,7 +215,7 @@ public class RadarView extends View {
 
         for(int i=0;i<dataList.size();i++){
             RadarData itemData=dataList.get(i);
-            double percent=itemData.percent;
+            double percent=itemData.percent2;
             float x=computePointXY(i,(float) (radius*percent)).x;
             float y=computePointXY(i,(float) (radius*percent)).y;
 
@@ -258,13 +237,106 @@ public class RadarView extends View {
     private void drawValueText(Canvas canvas){
         for(int i=0;i<dataList.size();i++){
             RadarData itemData=dataList.get(i);
-            double percent=itemData.percent;
+            double percent=itemData.percent2;
 
-            String value=MathUtil.keep2decimal(percent);
+            String value=MathUtil.keep2decimal(percent*100)+"%";
+            Paint.FontMetrics fontMetrics=mTextPaint.getFontMetrics();
+
+            float fontHeight=fontMetrics.descent-fontMetrics.ascent;
+
+            float x=computePointXY(i,radius/2).x;
+            float y=computePointXY(i,radius/2).y;
+
+            float length=mTextPaint.measureText(value);
+
+            canvas.drawText(value,x-length/2,y,mTextPaint);
 
         }
+    }
+
+    private void drawValueText2(Canvas canvas){
+        for(int i=0;i<dataList.size();i++){
+            RadarData itemData=dataList.get(i);
+            double percent=itemData.percent1;
+
+            String title=itemData.title;
+            String value=MathUtil.keep2decimal(percent*100)+"%";
+            Paint.FontMetrics fontMetrics=mTextPaint.getFontMetrics();
+
+            float fontHeight=fontMetrics.descent-fontMetrics.ascent;
+
+            float x=computePointXY(i,radius).x;
+            float y=computePointXY(i,radius).y;
+
+            float x1;
+            float y1;
+            float x2;
+            float y2;
+            float length;
+
+            float addRadius1=(float)(fontHeight*3/2/Math.cos(mAngle/2));
+            float addRadius2=(float)(fontHeight/2/Math.cos(mAngle/2));
+
+            float length1=mTextPaint.measureText(value);
+            float length2=mTextPaint.measureText(value);
+
+            length=length1>=length2?length1:length2;
+
+            if(y==mPointCenter.y){
 
 
+                if(x<mPointCenter.x){
+                    x1=x-length;
+                    x2=x-length;
+                }else {
+                    x1=x;
+                    x2=x;
+                }
+
+                y1=y-fontHeight/2;
+                y2=y+fontHeight/2;
+
+
+            }else {
+                x1=computePointXY(i,radius+addRadius1).x;
+                y1=computePointXY(i,radius+addRadius1).y;
+
+                x2=computePointXY(i,radius+addRadius2).x;
+                y2=computePointXY(i,radius+addRadius2).y;
+
+
+                x1=x1-length/2;
+                x2=x2-length/2;
+
+
+                y1=y-fontHeight/2;
+                y2=y+fontHeight/2;
+
+            }
+
+
+
+            canvas.drawText(title,x1,y1,mTextPaint);
+            canvas.drawText(value,x2,y2,mTextPaint);
+
+
+
+
+
+
+//            if(y<mPointCenter.y){
+//
+//
+//            }else if(y==mPointCenter.y){
+//
+//            }else {
+//
+//            }
+
+
+//            canvas.drawText(value,x-length/2,y,mTextPaint);
+
+        }
     }
 
 
@@ -279,5 +351,39 @@ public class RadarView extends View {
         return (int) (spValue * fontScale + 0.5f);
     }
 
+
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+
+
+        mPointCenter = new PointF(w / 2, h / 2);
+
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+//        Paint paint=new Paint();
+//        paint.setAntiAlias(true);       //抗锯齿功能
+//        paint.setStyle(Paint.Style.FILL);       //内部填充
+//        paint.setColor(mVertical_Line_Color);   //设置画笔颜色
+
+        if (dataList == null || dataList.size() == 0) {
+            return;
+        }
+        initView();
+        initPaint();
+        drawLine(canvas);
+//        drawPolygon(canvas);
+        drawRecGap(canvas);
+        drawDataPoint(canvas);
+        drawValueText(canvas);
+        drawValueText2(canvas);
+
+    }
 
 }

@@ -8,11 +8,16 @@ package com.company.project;
  */
 public class RadarData {
 
-    public double percent;
+    public String title;
+
+    public double percent1=1;
+    public double percent2;
 
 
-    public void initData(){
-        percent=Math.random();
+    public void initData(int position){
+        title=String.format("第%d组数据",position);
+        percent2=Math.random();
+
     }
 
 
