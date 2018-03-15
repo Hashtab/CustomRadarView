@@ -1,14 +1,18 @@
 package com.company.project;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.company.project.common.utils.MathUtil;
@@ -249,7 +253,9 @@ public class RadarView extends View {
 
             float length=mTextPaint.measureText(value);
 
-            canvas.drawText(value,x-length/2,y,mTextPaint);
+//            canvas.drawText(value,x-length/2,y+fontHeight/2,mTextPaint);
+         mTextPaint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText(value,x,y+fontHeight/2,mTextPaint);
 
         }
     }
@@ -272,22 +278,21 @@ public class RadarView extends View {
             float y1;
             float x2;
             float y2;
-            float length;
 
             float addRadius1=(float)(fontHeight*3/2/Math.cos(mAngle/2));
             float addRadius2=(float)(fontHeight/2/Math.cos(mAngle/2));
 
-            float length1=mTextPaint.measureText(value);
+            float length1=mTextPaint.measureText(title);
             float length2=mTextPaint.measureText(value);
 
-            length=length1>=length2?length1:length2;
+//            length=length1>=length2?length1:length2;
 
             if(y==mPointCenter.y){
 
 
                 if(x<mPointCenter.x){
-                    x1=x-length;
-                    x2=x-length;
+                    x1=x-length1;
+                    x2=x-length2;
                 }else {
                     x1=x;
                     x2=x;
@@ -297,47 +302,86 @@ public class RadarView extends View {
                 y2=y+fontHeight/2;
 
 
-            }else {
+            }else if(y<mPointCenter.y){
                 x1=computePointXY(i,radius+addRadius1).x;
                 y1=computePointXY(i,radius+addRadius1).y;
 
                 x2=computePointXY(i,radius+addRadius2).x;
                 y2=computePointXY(i,radius+addRadius2).y;
 
+                x2=x1-length2/2;
+                x1=x1-length1/2;
 
-                x1=x1-length/2;
-                x2=x2-length/2;
 
 
-                y1=y-fontHeight/2;
-                y2=y+fontHeight/2;
+            }else {
+
+                x1=computePointXY(i,radius+addRadius2+dp2px(5f)).x;
+                y1=computePointXY(i,radius+addRadius2+dp2px(5f)).y;
+
+                x2=computePointXY(i,radius+addRadius1).x;
+                y2=computePointXY(i,radius+addRadius1).y;
+
+                x2=x1-length2/2;
+                x1=x1-length1/2;
 
             }
-
-
 
             canvas.drawText(title,x1,y1,mTextPaint);
             canvas.drawText(value,x2,y2,mTextPaint);
 
 
-
-
-
-
-//            if(y<mPointCenter.y){
-//
-//
-//            }else if(y==mPointCenter.y){
-//
-//            }else {
-//
-//            }
-
-
-//            canvas.drawText(value,x-length/2,y,mTextPaint);
-
         }
     }
+
+
+    private void drawIcon(Canvas canvas){
+
+        Bitmap bitmap= BitmapFactory.decodeResource(mContext.getResources(),R.mipmap.icon_down);
+
+//        int width=bitmap.getWidth();
+//        int height=bitmap.getHeight();
+
+        float newWidth=dp2px(8f);
+        float newHeight=dp2px(18f);
+
+//        float scale=width/newWidth;
+//
+//        Matrix matrix=new Matrix();
+//        matrix.postScale(scale,scale);
+//
+//        Bitmap newBitmap=Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
+
+//        bitmap.recycle();
+
+
+//        Rect srcRect=new Rect(0,0,newBitmap.getWidth(),newBitmap.getHeight());
+
+
+        for(int i=0;i<dataList.size();i++){
+            RadarData itemData=dataList.get(i);
+            double percent=itemData.percent2;
+
+            String value=MathUtil.keep2decimal(percent*100)+"%";
+            Paint.FontMetrics fontMetrics=mTextPaint.getFontMetrics();
+
+            float fontHeight=fontMetrics.descent-fontMetrics.ascent;
+
+            float x=computePointXY(i,radius/2).x;
+            float y=computePointXY(i,radius/2).y;
+
+            float length=mTextPaint.measureText(value);
+
+            RectF destRect=new RectF((float)( x-length/2f-newWidth),(float)(y-newHeight/2f),x-length/2f,(float)( y+newHeight/2f));
+//            canvas.drawText(value,x-length/2,y,mTextPaint);
+            canvas.drawBitmap(bitmap,null,destRect,mTextPaint);
+
+        }
+
+    }
+
+
+
 
 
 
@@ -356,8 +400,6 @@ public class RadarView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
-
 
         mPointCenter = new PointF(w / 2, h / 2);
 
@@ -383,6 +425,7 @@ public class RadarView extends View {
         drawDataPoint(canvas);
         drawValueText(canvas);
         drawValueText2(canvas);
+        drawIcon(canvas);
 
     }
 
