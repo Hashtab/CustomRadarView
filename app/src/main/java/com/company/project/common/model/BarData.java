@@ -1,12 +1,12 @@
-package com.company.project;
+package com.company.project.common.model;
 
 /**
  * 作者: lijun
- * 时间: 2018/3/12 11:05
+ * 时间: 2018/3/16 11:37
  * 邮箱: lijun@eims.com.cn
- * 描述：雷达图数据模型
+ * 描述：柱状图数据
  */
-public class RadarData {
+public class BarData {
 
     public String title;
 
@@ -19,6 +19,5 @@ public class RadarData {
         percent2=Math.random();
 
     }
-
 
 }

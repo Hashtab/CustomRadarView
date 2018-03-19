@@ -2,17 +2,13 @@ package com.company.project;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.Bind;
+import android.view.View;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.radarView)
-    RadarView radarView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,21 +18,26 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
-    private void initView(){
-        List<RadarData> dataList=new ArrayList<>();
-        for(int i=0;i<6;i++){
-            RadarData radarData=new RadarData();
-            radarData.initData(i);
-            dataList.add(radarData);
-        }
-
-
-        radarView.setData(dataList);
-
+    private void initView() {
 
 
 
     }
 
 
+    @OnClick({R.id.radarChartBtn, R.id.barChartBtn, R.id.compineCharBtn})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.radarChartBtn:
+                //雷达图
+                RadarChartActivity.go(this);
+                break;
+            case R.id.barChartBtn:
+                //柱状图
+                break;
+            case R.id.compineCharBtn:
+                //折线图
+                break;
+        }
+    }
 }

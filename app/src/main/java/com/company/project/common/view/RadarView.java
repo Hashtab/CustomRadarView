@@ -1,20 +1,20 @@
-package com.company.project;
+package com.company.project.common.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.company.project.R;
+import com.company.project.common.model.RadarData;
 import com.company.project.common.utils.MathUtil;
 
 import java.util.List;
@@ -58,6 +58,7 @@ public class RadarView extends View {
 
     public RadarView(Context context) {
         super(context);
+        this.mContext=context;
     }
 
     public RadarView(Context context, @Nullable AttributeSet attrs) {
@@ -337,7 +338,7 @@ public class RadarView extends View {
 
     private void drawIcon(Canvas canvas){
 
-        Bitmap bitmap= BitmapFactory.decodeResource(mContext.getResources(),R.mipmap.icon_down);
+        Bitmap bitmap= BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.icon_down);
 
 //        int width=bitmap.getWidth();
 //        int height=bitmap.getHeight();
